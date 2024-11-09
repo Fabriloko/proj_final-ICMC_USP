@@ -1,4 +1,6 @@
 import pandas as pd
+import requests as rq
+from io import StringIO
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.linear_model import LinearRegression
@@ -16,9 +18,17 @@ class Modelo():
         
         O dataset é carregado com as seguintes colunas: SepalLengthCm, SepalWidthCm, PetalLengthCm, PetalWidthCm e Species.
         """
-        path = 'Fabriloko/proj_final-ICMC_USP/proj_final-ICMC_USP/iris.data'
+        path = f"https://raw.githubusercontent.com/Fabriloko/proj_final-ICMC_USP/refs/heads/main/proj_final-ICMC_USP/iris.data"
         names = ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm', 'Species']
-        self.df = pd.read_csv(path, names= names)
+
+        response = rq.get(path)
+
+        if response.status_code == 200:
+            data = StringIO(response.text)
+            self.df = pd.read_csv(data, names= names)
+        else:
+            print(f"Error: Unable to fetch file (HTTP {response.status_code})")
+            None
 
     def TratamentoDeDados(self):
         """
@@ -33,6 +43,9 @@ class Modelo():
             * Explore gráficos e visualizações para obter insights sobre a distribuição dos dados.
             * Certifique-se de que os dados estão limpos e prontos para serem usados no treinamento do modelo.
         """
+        self.df.head()
+
+
         pass
 
     def Treinamento(self):
