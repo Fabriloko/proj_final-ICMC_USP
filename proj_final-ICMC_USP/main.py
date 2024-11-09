@@ -1,6 +1,10 @@
 import pandas as pd
 import requests as rq
 from io import StringIO
+
+import numpy as np
+import matplotlib.pyplot as plt
+
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.linear_model import LinearRegression
@@ -18,14 +22,14 @@ class Modelo():
         
         O dataset é carregado com as seguintes colunas: SepalLengthCm, SepalWidthCm, PetalLengthCm, PetalWidthCm e Species.
         """
-        path = f"https://raw.githubusercontent.com/Fabriloko/proj_final-ICMC_USP/refs/heads/main/proj_final-ICMC_USP/iris.data"
-        names = ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm', 'Species']
+        raw_url = f"https://raw.githubusercontent.com/Fabriloko/proj_final-ICMC_USP/refs/heads/main/proj_final-ICMC_USP/{path}"
+        self.colunms = ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm', 'Species']
 
-        response = rq.get(path)
+        response = rq.get(raw_url)
 
         if response.status_code == 200:
             data = StringIO(response.text)
-            self.df = pd.read_csv(data, names= names)
+            self.df = pd.read_csv(data, names= self.colunms)
         else:
             print(f"Error: Unable to fetch file (HTTP {response.status_code})")
             None
@@ -45,6 +49,15 @@ class Modelo():
         """
         self.df.head()
 
+        fig, axs = plt.subplots(2, 2, figsize= (6, 6), layout= "tight")
+        fig.suptitle('Título da Figure')
+        fig.subplots_adjust(left=0.2, wspace=0.6)
+        
+        for i in [0, 1]:
+            for j in [0, 1]:
+                axs[i, j].set_title(f'Título do Axes {i}.{j}')
+
+        plt.plot()
 
         pass
 
@@ -91,3 +104,9 @@ class Modelo():
 # Lembre-se de instanciar as classes após definir suas funcionalidades
 # Recomenda-se criar ao menos dois modelos (e.g., Regressão Linear e SVM) para comparar o desempenho.
 # A biblioteca já importa LinearRegression e SVC, mas outras escolhas de modelo são permitidas.
+
+model = Modelo()
+
+model.CarregarDataset("iris.data")
+
+model.TratamentoDeDados()
