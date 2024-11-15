@@ -7,10 +7,19 @@ import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression as LR
 
 class Modelo():
-    def __init__(self):
+    def __init__(self, type):
+        """
+        Importante definir o tipo de modelo utilizado.
+        Atualmente a seguinte lista é permitida para execução:
+        ['SVC', 'LR']
+        SVC - Suport Vector Clasification 
+        LR = Linear Regression
+        """
+        self.model
+        self.type = type #Tipo de Modelo
         pass
 
     def CarregarDataset(self, path):
@@ -93,7 +102,20 @@ class Modelo():
         
         Nota: Esta função deve ser ajustada conforme o modelo escolhido.
         """ 
-        
+        X = self.df.copy()
+        X.drop('Species', axis= 1)
+
+        y = self.df['Species'].copy()
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.2, shuffle= True, stratify= y)
+
+        if self.type == 'LR':
+            self.model = LR.fit(X_train, y_train)
+        elif self.type == 'SVC':
+            self.model = SVC.fit(X_train, y_train)
+        else:
+            print('!!! Nenhum tipo de modelo valido foi escolhido !!! \n Tente novamente :)')
+
         pass
 
     def Teste(self):
@@ -127,8 +149,10 @@ class Modelo():
 # Recomenda-se criar ao menos dois modelos (e.g., Regressão Linear e SVM) para comparar o desempenho.
 # A biblioteca já importa LinearRegression e SVC, mas outras escolhas de modelo são permitidas.
 
-model = Modelo()
+model = Modelo('LR')
 
 model.CarregarDataset("iris.data")
 
-model.TratamentoDeDados()
+# model.TratamentoDeDados()
+
+model.Treinamento()
