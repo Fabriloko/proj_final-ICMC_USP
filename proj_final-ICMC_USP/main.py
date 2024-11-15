@@ -23,13 +23,13 @@ class Modelo():
         O dataset é carregado com as seguintes colunas: SepalLengthCm, SepalWidthCm, PetalLengthCm, PetalWidthCm e Species.
         """
         raw_url = f"https://raw.githubusercontent.com/Fabriloko/proj_final-ICMC_USP/refs/heads/main/proj_final-ICMC_USP/{path}"
-        self.colunms = ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm', 'Species']
+        self.columns = ['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm', 'Species']
 
         response = rq.get(raw_url)
 
         if response.status_code == 200:
             data = StringIO(response.text)
-            self.df = pd.read_csv(data, names= self.colunms)
+            self.df = pd.read_csv(data, names= self.columns)
         else:
             print(f"Error: Unable to fetch file (HTTP {response.status_code})")
             None
@@ -47,17 +47,38 @@ class Modelo():
             * Explore gráficos e visualizações para obter insights sobre a distribuição dos dados.
             * Certifique-se de que os dados estão limpos e prontos para serem usados no treinamento do modelo.
         """
-        self.df.head()
-
-        fig, axs = plt.subplots(2, 2, figsize= (6, 6), layout= "tight")
-        fig.suptitle('Título da Figure')
-        fig.subplots_adjust(left=0.2, wspace=0.6)
+        print('Verificação de valores faltantes:\n')
+        for col in self.columns:
+            print(f'Número de missing na coluna {col}: {self.df[col].isnull().sum()}')
         
-        for i in [0, 1]:
-            for j in [0, 1]:
-                axs[i, j].set_title(f'Título do Axes {i}.{j}')
+        print(f'\nDetalhamento dos dados:\n{self.df.describe()}\n')
 
-        plt.plot()
+        count = self.df.value_counts(['Species'])
+        print(f'Contagem dos Dados:\n{count}\n')
+
+        for specie in self.df['Species'].unique():
+            heatmap = self.df[self.df['Species'] == specie].copy()
+            heatmap = heatmap.drop(['Species'], axis= 1)
+            heatmap = heatmap.corr()
+
+            fig, axs = plt.subplots(figsize= (8, 6), layout= "tight")
+            fig.suptitle(f'Heatmap {specie}')
+            fig.subplots_adjust(left= 0.2, wspace= 0.6)
+
+            im = axs.imshow(heatmap, vmin= -1, vmax= 1, cmap= 'coolwarm')
+
+            axs.set_xticks(np.arange(len(heatmap.columns)), labels= heatmap.columns)
+            axs.set_yticks(np.arange(len(heatmap.columns)), labels= heatmap.columns)
+
+            plt.setp(axs.get_xticklabels(), rotation= 45, ha= "right", rotation_mode= "anchor")
+
+            heatmap = heatmap.rename(columns={"SepalLengthCm": 0, "SepalWidthCm": 1, "PetalLengthCm": 2, "PetalWidthCm": 3})
+
+            for i in heatmap:
+                for j in heatmap:
+                    text = axs.text(j, i, round(heatmap[i][j], 2), ha= "center", va= "center", color= "black")
+
+            plt.show()
 
         pass
 
@@ -71,7 +92,8 @@ class Modelo():
             * Experimente técnicas de validação cruzada (cross-validation) para melhorar a acurácia final.
         
         Nota: Esta função deve ser ajustada conforme o modelo escolhido.
-        """
+        """ 
+        
         pass
 
     def Teste(self):
