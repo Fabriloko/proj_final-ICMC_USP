@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.linear_model import LinearRegression as LR
+from sklearn.linear_model import LogisticRegression as LR
+from sklearn.linear_model import LogisticRegressionCV as LRCV
+from sklearn.tree import DecisionTreeClassifier as DTC
 
 class Modelo():
     def __init__(self, type):
@@ -18,7 +20,6 @@ class Modelo():
         SVC - Suport Vector Clasification 
         LR = Linear Regression
         """
-        self.model
         self.type = type #Tipo de Modelo
         pass
 
@@ -103,28 +104,34 @@ class Modelo():
         Nota: Esta função deve ser ajustada conforme o modelo escolhido.
         """ 
         X = self.df.copy()
-        X.drop('Species', axis= 1)
+        X = X.drop('Species', axis= 1)
 
         y = self.df['Species'].copy()
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.2, shuffle= True, stratify= y)
 
         if self.type == 'LR':
-            self.model = LR.fit(X_train, y_train)
+            self.model = LR().fit(X_train, y_train)
+        if self.type == 'LRCV':
+            self.model = LRCV().fit(X_train, y_train)
         elif self.type == 'SVC':
-            self.model = SVC.fit(X_train, y_train)
+            self.model = SVC().fit(X_train, y_train)
+        elif self.type == 'DTC':
+            self.model = DTC().fit(X_train, y_train)
         else:
             print('!!! Nenhum tipo de modelo valido foi escolhido !!! \n Tente novamente :)')
 
-        pass
+        self.Teste(X_test, y_test)
 
-    def Teste(self):
+    def Teste(self, x, y):
         """
         Avalia o desempenho do modelo treinado nos dados de teste.
 
         Esta função deve ser implementada para testar o modelo e calcular métricas de avaliação relevantes, 
         como acurácia, precisão, ou outras métricas apropriadas ao tipo de problema.
         """
+
+
         pass
 
     def Train(self):
@@ -142,17 +149,13 @@ class Modelo():
 
         # Tratamento de dados opcional, pode ser comentado se não for necessário
         self.TratamentoDeDados()
-
+ 
         self.Treinamento()  # Executa o treinamento do modelo
 
 # Lembre-se de instanciar as classes após definir suas funcionalidades
 # Recomenda-se criar ao menos dois modelos (e.g., Regressão Linear e SVM) para comparar o desempenho.
 # A biblioteca já importa LinearRegression e SVC, mas outras escolhas de modelo são permitidas.
 
-model = Modelo('LR')
+model = Modelo('DTC')
 
-model.CarregarDataset("iris.data")
-
-# model.TratamentoDeDados()
-
-model.Treinamento()
+model.Train()
