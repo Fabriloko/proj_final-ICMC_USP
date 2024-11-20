@@ -11,16 +11,11 @@ from sklearn.linear_model import LogisticRegression as LR
 from sklearn.linear_model import LogisticRegressionCV as LRCV
 from sklearn.tree import DecisionTreeClassifier as DTC
 
+from sklearn import metrics
+
 class Modelo():
-    def __init__(self, type):
-        """
-        Importante definir o tipo de modelo utilizado.
-        Atualmente a seguinte lista é permitida para execução:
-        ['SVC', 'LR']
-        SVC - Suport Vector Clasification 
-        LR = Linear Regression
-        """
-        self.type = type #Tipo de Modelo
+    def __init__(self):
+
         pass
 
     def CarregarDataset(self, path):
@@ -108,13 +103,13 @@ class Modelo():
 
         y = self.df['Species'].copy()
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.2, shuffle= True, stratify= y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.8, shuffle= True, stratify= y)
 
         self.model = {
             "LR": LR().fit(X_train, y_train),
             "LRCV": LRCV().fit(X_train, y_train),
             "SVC": SVC().fit(X_train, y_train),
-            "DTC": DTC().fit(X_train, y_train)
+            "DTC": DTC().fit(X_train, y_train, )
         }
         
         self.Teste(X_test, y_test)
@@ -127,8 +122,20 @@ class Modelo():
         como acurácia, precisão, ou outras métricas apropriadas ao tipo de problema.
         """
         models = ["LR", "LRCV", "SVC", "DTC"]
+
+        print("Metricas dos Algoritmos:")
         for i in models:
-            print(f'{self.model[i].score(X, y) * 100 :.4}%')
+            print(f"Modelo {i}")
+
+            M = self.model[i]
+
+            y_pred = pd.Series(M.predict(X), name= 'Species_pred')
+
+            print(f"Escore :   {M.score(X, y) * 100 :.4}%")
+            print(f"Acuracia:  {metrics.accuracy_score(y, y_pred) * 100 :.4}%")
+            print(f"Revocação: {metrics.recall_score(y, y_pred, average= 'macro') * 100 :.4}%") 
+            print(f"Precisão:  {metrics.precision_score(y, y_pred, average= 'macro') * 100 :.4}%")
+            print(f"F-1 score: {metrics.f1_score(y, y_pred, average= 'macro') * 100 :.4}% \n")
 
         pass
 
@@ -154,6 +161,6 @@ class Modelo():
 # Recomenda-se criar ao menos dois modelos (e.g., Regressão Linear e SVM) para comparar o desempenho.
 # A biblioteca já importa LinearRegression e SVC, mas outras escolhas de modelo são permitidas.
 
-model = Modelo('DTC')
+model = Modelo()
 
 model.Train()
