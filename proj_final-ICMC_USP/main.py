@@ -110,27 +110,25 @@ class Modelo():
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.2, shuffle= True, stratify= y)
 
-        if self.type == 'LR':
-            self.model = LR().fit(X_train, y_train)
-        if self.type == 'LRCV':
-            self.model = LRCV().fit(X_train, y_train)
-        elif self.type == 'SVC':
-            self.model = SVC().fit(X_train, y_train)
-        elif self.type == 'DTC':
-            self.model = DTC().fit(X_train, y_train)
-        else:
-            print('!!! Nenhum tipo de modelo valido foi escolhido !!! \n Tente novamente :)')
-
+        self.model = {
+            "LR": LR().fit(X_train, y_train),
+            "LRCV": LRCV().fit(X_train, y_train),
+            "SVC": SVC().fit(X_train, y_train),
+            "DTC": DTC().fit(X_train, y_train)
+        }
+        
         self.Teste(X_test, y_test)
 
-    def Teste(self, x, y):
+    def Teste(self, X, y):
         """
         Avalia o desempenho do modelo treinado nos dados de teste.
 
         Esta função deve ser implementada para testar o modelo e calcular métricas de avaliação relevantes, 
         como acurácia, precisão, ou outras métricas apropriadas ao tipo de problema.
         """
-
+        models = ["LR", "LRCV", "SVC", "DTC"]
+        for i in models:
+            print(f'{self.model[i].score(X, y) * 100 :.4}%')
 
         pass
 
